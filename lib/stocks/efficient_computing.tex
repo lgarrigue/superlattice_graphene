@@ -1,0 +1,115 @@
+\documentclass[11pt,a4paper,reqno,french,tikz]{amsart}
+\usepackage[utf8]{inputenc} \usepackage[T1]{fontenc}
+%\usepackage{babel} % français \usepackage[latin1]{inputenc}
+\usepackage{amsthm,amsmath,amsfonts,amssymb,amsxtra}
+\usepackage{appendix,bookmark,comment,cite,hyperref,color,xcolor,cite,graphicx}
+
+%%%%%%%%%%%%%%%%%%%% Standard macros
+% Environments
+\newtheorem{theorem}{Theorem}[section]\newtheorem{definition}[theorem]{Definition}\newtheorem{lemma}[theorem]{Lemma}\newtheorem{example}[theorem]{Example}\newtheorem{proposition}[theorem]{Proposition}\newtheorem{corollary}[theorem]{Corollary}\newtheorem{conjecture}[theorem]{Conjecture}\newtheorem{remark}[theorem]{Remark}
+
+% Mathbb
+\let\C\relax\newcommand{\C}{\mathbb{C}}\newcommand{\Z}{\mathbb{Z}}\newcommand{\R}{\mathbb{R}}\newcommand{\N}{\mathbb{N}}
+
+% Mathcal
+\newcommand\cA{\mathcal{A}}\newcommand\cB{\mathcal{B}}\newcommand\cC{\mathcal{C}}\newcommand\cD{\mathcal{D}}\newcommand\cE{\mathcal{E}}\newcommand\cF{\mathcal{F}}\newcommand\cG{\mathcal{G}}\newcommand\cH{\mathcal{H}}\newcommand\cI{\mathcal{I}}\newcommand\cJ{\mathcal{J}}\newcommand\cK{\mathcal{K}}\newcommand\cL{\mathcal{L}}\newcommand\cM{\mathcal{M}}\newcommand\cN{\mathcal{N}}\newcommand\cO{\mathcal{O}}\newcommand\cP{\mathcal{P}}\newcommand\cQ{\mathcal{Q}}\newcommand\cR{\mathcal{R}}\newcommand\cS{\mathcal{S}}\newcommand\cT{\mathcal{T}}\newcommand\cU{\mathcal{U}}\newcommand\cV{\mathcal{V}}\newcommand\cW{\mathcal{W}}\newcommand\cX{\mathcal{X}}\newcommand\cY{\mathcal{Y}}\newcommand\cZ{\mathcal{Z}}
+
+% Math operators
+\DeclareMathOperator{\tr}{Tr}\DeclareMathOperator{\ran}{Ran}\DeclareMathOperator{\Span}{Span}\DeclareMathOperator{\Ker}{Ker}\DeclareMathOperator{\re}{Re}\DeclareMathOperator{\id}{id}\DeclareMathOperator{\im}{Im}\DeclareMathOperator{\dist}{dist}\let\div\relax\DeclareMathOperator{\div}{div}
+\def\d{{\rm d}}
+\usepackage{dsfont} % to define \mathds{1}
+\def\1{{\mathds{1}}}
+
+% Others
+\renewcommand{\ge}{\geqslant}\renewcommand{\le}{\leqslant}
+
+%%%%%%%%%%%%%%%%%%%% Macros Louis
+% Delimiters
+\newcommand{\pa}[1]{\left( #1 \right)}                              % ()
+\newcommand{\bpa}[1]{\big( #1 \big)}                                % ()
+\newcommand{\acs}[1]{\left\{ #1 \right\}}                       % {}
+\newcommand{\seg}[1]{\left[ #1 \right]}                             % []
+\newcommand{\ab}[1]{\left|#1\right|}                                % ||
+\newcommand{\ps}[1]{\left< #1 \right>}                              % <>
+\newcommand{\nor}[2]{ \left| \! \left| #1 \right| \! \right|_{#2} } % ||.||_{.}
+\newcommand{\norm}[1]{ \left| \! \left| #1 \right| \! \right| }     % ||.||
+
+% Greek letters shortcuts
+\newcommand\vp{\varphi}                            % φ
+\def\eps{\varepsilon}\newcommand{\ep}{\varepsilon} % ε
+\let\p\relax\newcommand{\p}{\psi}                  % ψ
+\newcommand{\na}{\nabla}                           % ∇
+
+% Others
+\newcommand{\f}[2]{\frac{#1}{#2}}                                              % fraction
+\newcommand{\bul}{$\bullet$ \hspace{0.1cm}}                                    % •
+\newcommand{\mymax}[1]{\underset{\substack{#1}}{\text{\normalfont{max}}}\;} % max
+\newcommand{\mymin}[1]{\underset{\substack{#1}}{\text{\normalfont{min}}}\;} % min
+\newcommand{\mysup}[1]{\underset{\substack{#1}}{\text{\normalfont{sup}}}\;} % sup
+\newcommand{\myinf}[1]{\underset{\substack{#1}}{\text{\normalfont{inf}}}\;} % inf
+\newcommand{\ind}[1]{_{\textup{#1}}}                                           % indice
+\newcommand{\mat}[1]{\begin{pmatrix} #1 \end{pmatrix}}                         % matrices
+\usepackage{listings}
+
+%%%%%%%%%%%%%%%%%%%% End macros
+
+\title[]{Efficiently compute stuff}
+\author[L. Garrigue]{Louis Garrigue}
+\address{Laboratoire AGM - UMR 8088, CNRS - CY Cergy Paris Université, 2 avenue Adolphe Chauvin, Cergy-Pontoise, 95302 cedex, France}
+\email{louis.garrigue@cyu.fr}
+\date{\today}
+\begin{document}
+\maketitle
+
+There will be
+\begin{itemize}
+\item object (struct in julia) which contains all the parameters for one computation, type is \texttt{OneComputation} and the objects are denoted by \texttt{oc}
+\item object (type \texttt{Stock}) which stores all the solutions, called \texttt{St\_comp}
+\end{itemize}
+{\color{red}{\texttt{oc} is very light while \texttt{St\_comp} is very heavy}}
+Rules :
+\begin{itemize}
+\item Any quantity can be computed having only one argument \texttt{oc}, possibly using only part of the arguments of \texttt{oc}. It's not a problem that those quantities are not stored because they are quick to compute (for instance the length of an object)
+\item Objects of type \texttt{OneComputation} have the minimal amount of variables
+\end{itemize}
+
+\subsection{Functions defined in the stock creation}%
+\label{sub:Functions defined in the stock creation}
+
+\begin{itemize}
+\item The functions defined in the stock creation will take the minimal amount of variables, to minimize the number of times they are computed and stored
+\item Define {\color{red}{only}} stored objects which are going to be {\color{red}{long}} to compute. If things are easy to compute (for instance the length of an object), defined them with external functions
+\end{itemize}
+
+\begin{lstlisting} 
+	function compute_map(coords,St_comp)
+		xi, precision = coords
+		xi + precision + X("p",xi,St_comp)
+	end
+\end{lstlisting}
+
+
+\subsection{External functions}%
+\label{sub:External functions}
+
+Those are the functions which are defined outside the stock functions.
+
+They in general take in argument \texttt{oc} and \texttt{St\_comp}. They don't use all the arguments. For instance to get the ``maps'' we can define
+\begin{lstlisting} 
+function get_map(oc,St_comp)
+	coords = oc.xi, oc.precision
+	X("map",coords,St_comp)
+end
+\end{lstlisting}
+So each object defined in stock has its external counterpart to call it. But other derivatives can also be defined like
+\begin{lstlisting} 
+function get_map_length(oc,St_comp)
+	map = get_map(oc,St_comp)
+	length(map)
+end
+\end{lstlisting}
+
+
+\bibliographystyle{siam}
+\bibliography{/home/louis/Documents/biblio}
+\end{document}
