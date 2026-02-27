@@ -16,7 +16,7 @@ include("../lib/stocks/stock_module.jl")
 #################### Second step : compute the effective potentials 𝕍, 𝕎, 𝔸, etc. Very rapid
 
 mean(l) = sum(l)/length(l)
-path_pics_root = "/home/louis/Documents/tentatives/1-improved_graphene/pics/" # choose a convenient path for the pictures
+path_pics_root = "/home/louis/Documents/tentatives/1-superlattice_graphene/pics/" # choose a convenient path for the pictures
 
 # Computes effective potentials, makes plots, gives some information
 function compute_bands(oc,St_sol;res_bands=10)
@@ -127,15 +127,16 @@ function plot_diag(oc,St_sol; only_one=false,more_name="",energy_amplitude=0.5, 
     # str_no_V = ifo.no_V ? "_noV" : ""
     str_schur = oc.schur ? "_schur" : ""
     str_N_macro = print_N_macro ? "_Nmacro_"*string(oc.N_macro) : ""
-    name = string("invep_",oc.invε,"_order_",oc.order,"_n0_",oc.n_zeroth,"_V_",oc.V_intensity,"_kind_",oc.V_kind,"_",oc.k_dep,str_only_eff,str_schur,str_N_macro,more_name)
+    kdep_str = oc.k_dep=="k_dependent" ? "k_dep" : "k_indep"
+    name = string("invep_",oc.invε,"_order_",oc.order,"_n0_",oc.n_zeroth,"_V_",oc.V_intensity,"_kind_",oc.V_kind,"_",kdep_str,str_only_eff,str_schur,str_N_macro,more_name)
     linestyles = [:dash,:dot]
     # px("Starts plotting bands")
-    bd.root_path = "improved_graphene/plots_bands/"*string(oc.invε)*"/" #"./plots_bands/"*string(oc.invε)*"/"
+    bd.root_path = "superlattice_graphene/plots_bands/"*string(oc.invε)*"/" #"./plots_bands/"*string(oc.invε)*"/"
     if path!=""
         bd.full_path = path
     end
     # if true
-        # bd.root_path = [bd.root_path,"../../../tentatives/1-improved_graphene/pics/"]
+        # bd.root_path = [bd.root_path,"../../../tentatives/1-superlattice_graphene/pics/"]
     # end
     # if oc.out_name != nothing
         # name = oc.out_name
@@ -172,19 +173,19 @@ function one_comp()
     oc = OneComp()
     # only_one = "ex"
     # only_one = "ef"
-    # oc.N_macro = 10
+    oc.N_macro = 15
     oc.precision = "precise"
-    # oc.k_dep = "k_independent"
+    oc.k_dep = "k_dependent"
     oc.V_kind = "g"
-    oc.invε = 1
-    oc.V_intensity = 0
-    # oc.order = 2
-    res_bands = 20
+    oc.invε = 7
+    oc.V_intensity = 1e-4
+    oc.order = 2
+    res_bands = 7
     energy_amplitude = 0.79
-    oc.e = "ex"
+    # oc.e = "ex"
     # i = get_i_dmode(oc,St)
     # px("i_dmode is ",i)
-    plot_diag(oc,St;energy_amplitude=energy_amplitude,res_bands=res_bands,finalized_plot=true)
+    plot_diag(oc,St;energy_amplitude=energy_amplitude,res_bands=res_bands,finalized_plot=false)
 end
 
 function make_study()
@@ -287,7 +288,7 @@ function study_ℓ(St0=0;short=true)
     oc.precision = "precise"
     oc.invε = 7
     orders = [0,1,2]
-    vs = [6]
+    vs = [4]
     oc.V_kind = "ng"
     # Plot options
     energy_amplitude = 0.79
@@ -377,9 +378,9 @@ St = 0
 # St = study_ε(St,short=short)
 # study_ε_fixed_ν(St;short=short)
 # St = study_v(St,short=short)
-# St = study_ℓ(St,short=short)
+St = study_ℓ(St,short=short)
 # St = study_N(St,short=short)
 # St
-neutral_band_ε0_v0()
+# neutral_band_ε0_v0()
 # one_comp()
 nothing

@@ -45,6 +45,8 @@ mutable struct OneComp
     schur
     precision
 
+    forced_i_dmode
+
     function OneComp()
         oc = new()
         oc.e = "ef"
@@ -59,6 +61,7 @@ mutable struct OneComp
         oc.k_dep="k_independent"
         oc.schur=false
         oc.precision = "normal"
+        oc.forced_i_dmode = -1
         oc
     end
 end

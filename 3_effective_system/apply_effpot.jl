@@ -28,7 +28,14 @@ function continuously_get_next_eigenvector(last_ψ,var,oc,St_sol;previous_is=[])
         i = previous_is[end]
     else
         px("COMPUTES FULL I DMODE")
-        i = get_i_dmode(oc,St_sol)
+        iforced = oc.forced_i_dmode
+        i_nat = get_i_dmode(oc,St_sol)
+        if iforced!=-1 && oc.e == "ef"
+            px("FORCED I DMODE ! forced to be ",iforced," instead of ",i_nat)
+            i = iforced
+        else
+            i = i_nat
+        end
     end
     px("i_dmode is ",i)
     ψs, is = get_ψs_around(i,oc,St_sol; amplitude = 200)
@@ -50,6 +57,7 @@ function continuously_get_next_eigenvector(last_ψ,var,oc,St_sol;previous_is=[])
     end
     px("new_i_dmode is ",i)
     ψ, i
+    # ψ, get_i_dmode(oc,St_sol)
 end
 
 function produce_line(λs,var,oc,St_sol; V_base=0)
@@ -121,7 +129,7 @@ function one_study()
     var = "V"
     # var = "invep"
     λs = []
-    λkred = 1e-7
+    λkred = 1e-5
     # λkred = 0.3
     short = false
     finalized = true
@@ -133,12 +141,20 @@ function one_study()
             res = 3
             oc.invε = 2
         end
-        res = 15
-        λs = get_λs(-4,-1.1;res=6) # V varies
-        λs = get_λs_log_lin(-1,0.9;res=res) # V varies
-        sp = []
-        λs = vcat(sp,λs)
-        oc.N_macro = 15
+        res = 10
+        λs = []
+        # λs = get_λs(-4,-1.2;res=3) # V varies
+        λss0 = get_λs_log_lin(-1,0.1;res=3) # V varies
+        λss1 = get_λs_log_lin(0.2,0.6;res=20) # V varies
+        λss2 = get_λs_log_lin(0.601,0.8;res=5) # V varies
+        λss3 = get_λs_log_lin(0.801,0.9;res=5) # V varies
+        # λss1 = get_λs_log_lin(0.2,0.5;res=15) # V varies
+        # λss2 = get_λs_log_lin(0.501,0.8;res=24) # V varies
+        # λss3 = get_λs_log_lin(0.801,0.9;res=29) # V varies
+        # λss = []
+        λs = vcat(λss0,λss1,λss2,λss3)
+        oc.N_macro = 9 # take 5 for the k-dependent curves to exist
+        λkred = 1e-5
         # oc.precision = "ultra"
     elseif var=="lambda_k"
         res = 4
@@ -151,7 +167,9 @@ function one_study()
         λs2 = get_λs_log_lin(1.03,1.15;res=5) # lambda_k
         λs = vcat(sp,λs)
         λs = vcat(λs2,λs)
-        oc.N_macro = 15
+        λs = get_λs_log_lin(-3,-0.5;res=3)
+        oc.N_macro = 13 # 15 normalement
+        λkred = 1e-7
         # λs = sp
     elseif var in ["invep"]
         λs = [8,11,14,17,20,23] # ε
@@ -168,8 +186,9 @@ function one_study()
     px("λs \n",λs)
 
     px("STUDY "*var)
-    St_sol = create_stock_sol()
     # λkred = 0.5
+    St_sol = create_stock_sol()
+    # St_sol.p["i_dmode_exception"] = ("ef",2,"k_independent",7) # ef_ex, order, kdep, Nmacro
     oc.kred = λkred*K_DIR
     oc.V_intensity = 0
     oc.n_zeroth = 2
@@ -185,10 +204,25 @@ function one_study()
         orders = [0]
     end
     # orders = [0]
-    for order in orders, kdep in (var=="V" ? kdo(order) : ["k_independent"])
-    # for order in orders, kdep in kdo(order)
+    # for order in orders, kdep in (var=="V" ? kdo(order) : ["k_independent"])
+    for order in orders, kdep in kdo(order)
         oc0 = change_oc(order,"order",oc)
         oc1 = change_oc(kdep,"k_dep",oc0)
+        # if (kdep,orders) == ("k_dependent"
+        if oc1.e == "ef" && oc1.invε == 7 && oc1.order == 2 && oc1.k_dep == "k_dependent" && oc1.schur == false
+            if oc1.N_macro == 7
+                oc1.forced_i_dmode = 48
+            elseif oc1.N_macro == 9
+                oc1.forced_i_dmode = 75
+            elseif oc1.N_macro == 11
+                oc1.forced_i_dmode = 101
+            elseif oc1.N_macro == 13
+                oc1.forced_i_dmode = 122
+            elseif oc1.N_macro == 15
+                oc1.forced_i_dmode = 134
+            end
+            px("ADDED A FORCED I DMODE")
+        end
         push!(ocs,oc1)
     end
     for zs in [6]

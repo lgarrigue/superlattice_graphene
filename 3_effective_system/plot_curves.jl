@@ -1,7 +1,7 @@
 COLORS = ["red","brown","blue","black","brown","green","orange","pink","cyan","grey",RGBf(0.1, 0.9, 0.4),RGBf(0.4, 0.2, 0.5),RGBf(0.7, 0.1, 0.3),RGBf(0.7, 0.54, 0.9),RGBf(0.1, 0.4, 0.5),RGBf(0.9, 0.1, 0.4)]
 
 
-PATH_PLOTS = "../../../tentatives/1-improved_graphene/pics/curves"
+PATH_PLOTS = "../../../tentatives/1-superlattice_graphene/pics/curves"
 
 function plot_curves(λs,var,ocs,St_sol,name,var_str,leg_info; miny="",orientation=:horizontal, plot=true, V_base=0, scat=false, finalized=true)
     #### Builds a plot
@@ -13,6 +13,7 @@ function plot_curves(λs,var,ocs,St_sol,name,var_str,leg_info; miny="",orientati
     ax = Axis(f[1, 1], 
               xscale=Makie.log10, yscale=Makie.log10, xlabel=xlabel)#, yminorticks = [10^(float(n)) for n=-15:15], yminorticksvisible = true, yminorgridvisible = true)#, xticks = [10^(-4)])ylabel=ylabel, 
     Makie.xlims!(ax, 1e-1, maximum(λs))
+    Makie.xlims!(ax, minimum(λs), maximum(λs))
 
     ax.xticks = LogTicks(-12:1)
     ax.yticks = LogTicks(-12:1)
